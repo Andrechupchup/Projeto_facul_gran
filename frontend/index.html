@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DoaCiclo - Doação de peças e eletrodomésticos</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="index.html">🔁 DoaCiclo</a>
+  <nav id="nav-usuario"></nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Doe. Reaproveite. Transforme.</h1>
+    <p>O DoaCiclo conecta empresas e pessoas que têm eletrodomésticos e peças
+    parados a famílias que precisam deles, reduzindo o descarte e ajudando
+    quem mais necessita.</p>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="filtros">
+    <select id="filtro-categoria">
+      <option value="">Todas as categorias</option>
+      <option value="Geladeira">Geladeira</option>
+      <option value="Fogão">Fogão</option>
+      <option value="Máquina de lavar">Máquina de lavar</option>
+      <option value="Micro-ondas">Micro-ondas</option>
+      <option value="Peças e componentes">Peças e componentes</option>
+      <option value="Outros">Outros</option>
+    </select>
+    <button class="btn secundario" id="btn-filtrar">Filtrar</button>
+  </div>
+
+  <div id="mensagem-area"></div>
+  <div class="grid-itens" id="grid-itens">
+    <p class="vazio">Carregando itens disponíveis...</p>
+  </div>
+</main>
+
+<footer class="rodape">
+  DoaCiclo — Projeto Integrador · Feito para conectar doação e necessidade real.
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

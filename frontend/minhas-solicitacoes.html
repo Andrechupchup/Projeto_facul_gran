@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas solicitações - DoaCiclo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="index.html">🔁 DoaCiclo</a>
+  <nav id="nav-usuario"></nav>
+</header>
+
+<main>
+  <h1 style="text-align:center">Minhas solicitações</h1>
+  <div id="conteudo"><p class="vazio">Carregando...</p></div>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+const usuario = getUsuario();
+if (!usuario || usuario.tipo !== 'beneficiario') {
+  window.location.href = 'login.html';
+}
+
+async function carregar() {
+  const container = document.getElementById('conteudo');
+  try {
+    const lista = await api('/solicitacoes');
+    if (lista.length === 0) {
+      container.innerHTML = '<p class="vazio">Você ainda não solicitou nenhum item.</p>';
+      return;
+    }
+    container.innerHTML = `
+      <table class="tabela">
+        <thead><tr><th>Item</th><th>Categoria</th><th>Status</th><th>Data</th></tr></thead>
+        <tbody>
+          ${lista.map(s => `
+            <tr>
+              <td>${s.item_nome}</td>
+              <td>${s.categoria}</td>
+              <td><span class="badge ${s.status}">${s.status}</span></td>
+              <td>${new Date(s.criado_em).toLocaleDateString('pt-BR')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) {
+    container.innerHTML = `<p class="vazio">Erro: ${e.message}</p>`;
+  }
+}
+
+carregar();
+</script>
+</body>
+</html>

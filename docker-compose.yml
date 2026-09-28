@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: doaciclo_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: doaciclo
+      POSTGRES_PASSWORD: doaciclo
+      POSTGRES_DB: doaciclo
+    ports:
+      - "5432:5432"
+    volumes:
+      - doaciclo_pgdata:/var/lib/postgresql/data
+      - ./backend/src/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U doaciclo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: ./backend
+    container_name: doaciclo_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://doaciclo:doaciclo@db:5432/doaciclo
+      JWT_SECRET: troque_esta_chave_em_producao
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend:ro
+
+volumes:
+  doaciclo_pgdata:

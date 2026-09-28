@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel - DoaCiclo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="index.html">🔁 DoaCiclo</a>
+  <nav id="nav-usuario"></nav>
+</header>
+
+<main>
+  <h1 style="text-align:center">Painel</h1>
+  <div class="abas">
+    <button class="ativa" data-aba="itens">Meus itens</button>
+    <button data-aba="solicitacoes">Solicitações recebidas</button>
+  </div>
+  <div id="mensagem-area"></div>
+  <div id="painel-itens"><p class="vazio">Carregando...</p></div>
+  <div id="painel-solicitacoes" style="display:none"><p class="vazio">Carregando...</p></div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

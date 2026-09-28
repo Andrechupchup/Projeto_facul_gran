@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar - DoaCiclo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="index.html">🔁 DoaCiclo</a>
+  <nav id="nav-usuario"></nav>
+</header>
+
+<main>
+  <h1 style="text-align:center">Entrar</h1>
+  <div id="mensagem-area" style="max-width:480px;margin:0 auto"></div>
+  <form class="formulario" id="form-login">
+    <label>Email
+      <input type="email" name="email" required>
+    </label>
+    <label>Senha
+      <input type="password" name="senha" required>
+    </label>
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+  <p style="text-align:center;margin-top:16px">
+    Não tem conta? <a href="cadastro.html">Cadastre-se</a>
+  </p>
+  <p style="text-align:center;color:#5b6b67;font-size:0.85rem">
+    Conta de administrador de demonstração: admin@doaciclo.org / admin123
+  </p>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+document.getElementById('form-login').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const dados = Object.fromEntries(new FormData(ev.target));
+  const area = document.getElementById('mensagem-area');
+  try {
+    const resposta = await api('/auth/login', { method: 'POST', body: JSON.stringify(dados) });
+    salvarSessao(resposta.token, resposta.usuario);
+    window.location.href = 'index.html';
+  } catch (e) {
+    area.innerHTML = `<div class="mensagem erro">${e.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

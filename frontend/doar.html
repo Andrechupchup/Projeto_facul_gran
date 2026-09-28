@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doar item - DoaCiclo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="index.html">🔁 DoaCiclo</a>
+  <nav id="nav-usuario"></nav>
+</header>
+
+<main>
+  <h1 style="text-align:center">Cadastrar item para doação</h1>
+  <div id="mensagem-area" style="max-width:480px;margin:0 auto"></div>
+  <form class="formulario" id="form-item">
+    <label>Nome do item
+      <input type="text" name="nome" placeholder="Ex: Geladeira Brastemp 300L" required>
+    </label>
+    <label>Categoria
+      <select name="categoria" required>
+        <option value="Geladeira">Geladeira</option>
+        <option value="Fogão">Fogão</option>
+        <option value="Máquina de lavar">Máquina de lavar</option>
+        <option value="Micro-ondas">Micro-ondas</option>
+        <option value="Peças e componentes">Peças e componentes</option>
+        <option value="Outros">Outros</option>
+      </select>
+    </label>
+    <label>Condição
+      <select name="condicao" required>
+        <option value="novo">Novo</option>
+        <option value="seminovo">Seminovo</option>
+        <option value="usado_funcional">Usado e funcional</option>
+        <option value="peca_para_reparo">Peça para reparo</option>
+      </select>
+    </label>
+    <label>Descrição
+      <textarea name="descricao" rows="3" placeholder="Detalhes, estado de conservação, motivo da doação..."></textarea>
+    </label>
+    <label>URL de uma foto (opcional)
+      <input type="url" name="foto_url" placeholder="https://...">
+    </label>
+    <button class="btn" type="submit">Cadastrar doação</button>
+  </form>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+const usuario = getUsuario();
+if (!usuario || (usuario.tipo !== 'doador' && usuario.tipo !== 'admin')) {
+  window.location.href = 'login.html';
+}
+
+document.getElementById('form-item').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const dados = Object.fromEntries(new FormData(ev.target));
+  const area = document.getElementById('mensagem-area');
+  try {
+    await api('/itens', { method: 'POST', body: JSON.stringify(dados) });
+    area.innerHTML = '<div class="mensagem sucesso">Item cadastrado com sucesso! Obrigado por doar.</div>';
+    ev.target.reset();
+  } catch (e) {
+    area.innerHTML = `<div class="mensagem erro">${e.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

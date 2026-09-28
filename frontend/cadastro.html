@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastrar - DoaCiclo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="index.html">🔁 DoaCiclo</a>
+  <nav id="nav-usuario"></nav>
+</header>
+
+<main>
+  <h1 style="text-align:center">Criar conta</h1>
+  <div id="mensagem-area" style="max-width:480px;margin:0 auto"></div>
+  <form class="formulario" id="form-cadastro">
+    <label>Nome completo
+      <input type="text" name="nome" required>
+    </label>
+    <label>Email
+      <input type="email" name="email" required>
+    </label>
+    <label>Senha
+      <input type="password" name="senha" minlength="6" required>
+    </label>
+    <label>Cidade
+      <input type="text" name="cidade">
+    </label>
+    <label>Telefone
+      <input type="text" name="telefone">
+    </label>
+    <label>Tipo de conta
+      <select name="tipo" required>
+        <option value="beneficiario">Quero receber doações (beneficiário)</option>
+        <option value="doador">Quero doar itens (doador / empresa)</option>
+      </select>
+    </label>
+    <button class="btn" type="submit">Cadastrar</button>
+  </form>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+document.getElementById('form-cadastro').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const dados = Object.fromEntries(new FormData(ev.target));
+  const area = document.getElementById('mensagem-area');
+  try {
+    await api('/auth/register', { method: 'POST', body: JSON.stringify(dados) });
+    area.innerHTML = '<div class="mensagem sucesso">Conta criada! Faça login para continuar.</div>';
+    setTimeout(() => window.location.href = 'login.html', 1200);
+  } catch (e) {
+    area.innerHTML = `<div class="mensagem erro">${e.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>
