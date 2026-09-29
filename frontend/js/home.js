@@ -1,3 +1,9 @@
+const ICONE_CAIXA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/></svg>';
+const ICONE_LOCAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
+
+const usuarioLogado = getUsuario();
+let categoriaAtual = '';
+
 function condicaoLegivel(c) {
   const mapa = {
     novo: 'Novo',
@@ -8,18 +14,26 @@ function condicaoLegivel(c) {
   return mapa[c] || c;
 }
 
+function mostrarMensagem(tipo, texto) {
+  const area = document.getElementById('mensagem-area');
+  area.innerHTML = `<div class="mensagem ${tipo}">${texto}</div>`;
+  area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 async function carregarEstatisticas() {
   try {
     const stats = await api('/estatisticas');
-    const container = document.getElementById('stats');
-    container.innerHTML = `
-      <div class="stat-card"><div class="valor">${stats.itens_doados}</div><div class="rotulo">itens cadastrados</div></div>
-      <div class="stat-card"><div class="valor">${stats.itens_entregues}</div><div class="rotulo">itens entregues</div></div>
-      <div class="stat-card"><div class="valor">${stats.familias_atendidas}</div><div class="rotulo">famílias atendidas</div></div>
-      <div class="stat-card"><div class="valor">${stats.doadores_ativos}</div><div class="rotulo">doadores ativos</div></div>
-    `;
-  } catch (e) {
-    // estatisticas sao um extra; falha silenciosa nao deve travar a pagina
+    const cartoes = [
+      [stats.itens_doados, 'itens cadastrados'],
+      [stats.itens_entregues, 'itens entregues'],
+      [stats.familias_atendidas, 'famílias atendidas'],
+      [stats.doadores_ativos, 'doadores ativos'],
+    ];
+    document.getElementById('stats').innerHTML = cartoes.map(([valor, rotulo]) => `
+      <div class="stat-card"><div class="valor">${valor}</div><div class="rotulo">${rotulo}</div></div>
+    `).join('');
+  } catch {
+    return;
   }
 }
 
@@ -31,24 +45,24 @@ async function carregarItens(categoria) {
     const itens = await api(`/itens${query}`);
 
     if (itens.length === 0) {
-      grid.innerHTML = '<p class="vazio">Nenhum item disponível no momento.</p>';
+      grid.innerHTML = '<p class="vazio">Nenhum item disponível nesta categoria no momento.</p>';
       return;
     }
 
     grid.innerHTML = itens.map((item) => `
-      <div class="card-item">
-        <div class="foto">${item.foto_url ? `<img src="${item.foto_url}" alt="${item.nome}">` : 'Sem foto'}</div>
+      <article class="card-item">
+        <div class="foto">${item.foto_url ? `<img src="${item.foto_url}" alt="${item.nome}" loading="lazy">` : ICONE_CAIXA}</div>
         <div class="conteudo">
           <span class="categoria">${item.categoria}</span>
           <h3>${item.nome}</h3>
           <p class="descricao">${item.descricao || 'Sem descrição adicional.'}</p>
           <div class="rodape">
-            <span>${condicaoLegivel(item.condicao)}</span>
-            <span>${item.doador_cidade || ''}</span>
+            <span class="badge neutro">${condicaoLegivel(item.condicao)}</span>
+            ${item.doador_cidade ? `<span class="local">${ICONE_LOCAL}${item.doador_cidade}</span>` : ''}
           </div>
-          <button class="btn" onclick="solicitarItem(${item.id})">Solicitar</button>
+          <button class="btn" onclick="solicitarItem(${item.id})">Solicitar item</button>
         </div>
-      </div>
+      </article>
     `).join('');
   } catch (e) {
     grid.innerHTML = `<p class="vazio">Erro ao carregar itens: ${e.message}</p>`;
@@ -56,16 +70,12 @@ async function carregarItens(categoria) {
 }
 
 async function solicitarItem(itemId) {
-  const usuario = getUsuario();
-  const area = document.getElementById('mensagem-area');
-
-  if (!usuario) {
-    area.innerHTML = '<div class="mensagem erro">Você precisa entrar como beneficiário para solicitar um item.</div>';
+  if (!usuarioLogado) {
     window.location.href = 'login.html';
     return;
   }
-  if (usuario.tipo !== 'beneficiario') {
-    area.innerHTML = '<div class="mensagem erro">Apenas contas de beneficiário podem solicitar itens.</div>';
+  if (usuarioLogado.tipo !== 'beneficiario') {
+    mostrarMensagem('erro', 'Apenas contas de beneficiário podem solicitar itens.');
     return;
   }
 
@@ -74,16 +84,26 @@ async function solicitarItem(itemId) {
       method: 'POST',
       body: JSON.stringify({ item_id: itemId }),
     });
-    area.innerHTML = '<div class="mensagem sucesso">Solicitação enviada! Acompanhe em "Minhas solicitações".</div>';
-    carregarItens(document.getElementById('filtro-categoria').value);
+    mostrarMensagem('sucesso', 'Solicitação enviada! Acompanhe em <a href="minhas-solicitacoes.html">Minhas solicitações</a>.');
+    carregarItens(categoriaAtual);
+    carregarEstatisticas();
   } catch (e) {
-    area.innerHTML = `<div class="mensagem erro">${e.message}</div>`;
+    mostrarMensagem('erro', e.message);
   }
 }
 
-document.getElementById('btn-filtrar').addEventListener('click', () => {
-  carregarItens(document.getElementById('filtro-categoria').value);
+document.querySelectorAll('#filtros .chip').forEach((chip) => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#filtros .chip').forEach((c) => c.classList.remove('ativo'));
+    chip.classList.add('ativo');
+    categoriaAtual = chip.dataset.categoria;
+    carregarItens(categoriaAtual);
+  });
 });
+
+if (usuarioLogado && (usuarioLogado.tipo === 'doador' || usuarioLogado.tipo === 'admin')) {
+  document.getElementById('cta-doar').href = 'doar.html';
+}
 
 carregarEstatisticas();
 carregarItens();

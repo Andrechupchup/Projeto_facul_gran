@@ -16,30 +16,31 @@ document.querySelectorAll('.abas button').forEach((botao) => {
 async function carregarMeusItens() {
   const container = document.getElementById('painel-itens');
   try {
-    const rota = usuario.tipo === 'admin' ? '/itens?status=disponivel' : '/itens/meus/doados';
     const itens = usuario.tipo === 'admin' ? await api('/itens') : await api('/itens/meus/doados');
     if (itens.length === 0) {
       container.innerHTML = '<p class="vazio">Nenhum item cadastrado ainda. <a href="doar.html">Cadastre o primeiro</a>.</p>';
       return;
     }
     container.innerHTML = `
-      <table class="tabela">
-        <thead><tr><th>Item</th><th>Categoria</th><th>Status</th><th>Ações</th></tr></thead>
-        <tbody>
-          ${itens.map(i => `
-            <tr>
-              <td>${i.nome}</td>
-              <td>${i.categoria}</td>
-              <td><span class="badge ${i.status}">${i.status}</span></td>
-              <td>
-                ${i.status !== 'entregue' && i.status !== 'cancelado' ? `
-                  <button class="btn secundario" onclick="mudarStatusItem(${i.id}, 'cancelado')">Cancelar</button>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead><tr><th>Item</th><th>Categoria</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            ${itens.map(i => `
+              <tr>
+                <td>${i.nome}</td>
+                <td class="texto-suave">${i.categoria}</td>
+                <td><span class="badge ${i.status}">${rotuloStatus(i.status)}</span></td>
+                <td>
+                  ${i.status !== 'entregue' && i.status !== 'cancelado' ? `
+                    <button class="btn secundario pequeno" onclick="mudarStatusItem(${i.id}, 'cancelado')">Cancelar</button>
+                  ` : ''}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
     `;
   } catch (e) {
     container.innerHTML = `<p class="vazio">Erro: ${e.message}</p>`;
@@ -66,27 +67,31 @@ async function carregarSolicitacoes() {
       return;
     }
     container.innerHTML = `
-      <table class="tabela">
-        <thead><tr><th>Item</th><th>Beneficiário</th><th>Status</th><th>Ações</th></tr></thead>
-        <tbody>
-          ${lista.map(s => `
-            <tr>
-              <td>${s.item_nome}</td>
-              <td>${s.beneficiario_nome}</td>
-              <td><span class="badge ${s.status}">${s.status}</span></td>
-              <td>
-                ${s.status === 'pendente' ? `
-                  <button class="btn" onclick="mudarStatusSolicitacao(${s.id}, 'aprovada')">Aprovar</button>
-                  <button class="btn secundario" onclick="mudarStatusSolicitacao(${s.id}, 'recusada')">Recusar</button>
-                ` : ''}
-                ${s.status === 'aprovada' ? `
-                  <button class="btn" onclick="mudarStatusSolicitacao(${s.id}, 'entregue')">Marcar entregue</button>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead><tr><th>Item</th><th>Beneficiário</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            ${lista.map(s => `
+              <tr>
+                <td>${s.item_nome}</td>
+                <td class="texto-suave">${s.beneficiario_nome}</td>
+                <td><span class="badge ${s.status}">${rotuloStatus(s.status)}</span></td>
+                <td>
+                  <div class="acoes">
+                    ${s.status === 'pendente' ? `
+                      <button class="btn pequeno" onclick="mudarStatusSolicitacao(${s.id}, 'aprovada')">Aprovar</button>
+                      <button class="btn secundario pequeno" onclick="mudarStatusSolicitacao(${s.id}, 'recusada')">Recusar</button>
+                    ` : ''}
+                    ${s.status === 'aprovada' ? `
+                      <button class="btn pequeno" onclick="mudarStatusSolicitacao(${s.id}, 'entregue')">Marcar entregue</button>
+                    ` : ''}
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
     `;
   } catch (e) {
     container.innerHTML = `<p class="vazio">Erro: ${e.message}</p>`;

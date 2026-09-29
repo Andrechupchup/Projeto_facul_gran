@@ -4,33 +4,48 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Entrar - DoaCiclo</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="topo">
-  <a class="marca" href="index.html">🔁 DoaCiclo</a>
-  <nav id="nav-usuario"></nav>
+  <div class="topo-conteudo">
+    <a class="marca" href="index.html">
+      <span class="marca-simbolo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span>
+      DoaCiclo
+    </a>
+    <nav class="nav" id="nav-usuario"></nav>
+  </div>
 </header>
 
-<main>
-  <h1 style="text-align:center">Entrar</h1>
-  <div id="mensagem-area" style="max-width:480px;margin:0 auto"></div>
-  <form class="formulario" id="form-login">
-    <label>Email
-      <input type="email" name="email" required>
-    </label>
-    <label>Senha
-      <input type="password" name="senha" required>
-    </label>
-    <button class="btn" type="submit">Entrar</button>
-  </form>
-  <p style="text-align:center;margin-top:16px">
-    Não tem conta? <a href="cadastro.html">Cadastre-se</a>
-  </p>
-  <p style="text-align:center;color:#5b6b67;font-size:0.85rem">
-    Conta de administrador de demonstração: admin@doaciclo.org / admin123
-  </p>
+<main class="pagina-estreita">
+  <div class="cartao-form">
+    <h1>Entrar</h1>
+    <p class="subtitulo">Acesse sua conta para doar ou solicitar itens.</p>
+    <div id="mensagem-area"></div>
+    <form class="formulario" id="form-login">
+      <label>Email
+        <input type="email" name="email" autocomplete="email" required>
+      </label>
+      <label>Senha
+        <input type="password" name="senha" autocomplete="current-password" required>
+      </label>
+      <button class="btn" type="submit">Entrar</button>
+    </form>
+    <p class="rodape-form">Não tem conta? <a href="cadastro.html">Criar conta</a></p>
+  </div>
+  <p class="nota-demo">Administrador de demonstração: <code>admin@doaciclo.org</code> / <code>admin123</code></p>
 </main>
+
+<footer class="rodape-site">
+  <div class="rodape-conteudo">
+    <span><strong>DoaCiclo</strong> · Projeto Integrador</span>
+    <span>Conectando doação e necessidade real.</span>
+  </div>
+</footer>
 
 <script src="js/api.js"></script>
 <script>

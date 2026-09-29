@@ -1,5 +1,25 @@
 const API_BASE = '/api';
 
+const ROTULOS_TIPO = {
+  admin: 'Administrador',
+  doador: 'Doador',
+  beneficiario: 'Beneficiário',
+};
+
+const ROTULOS_STATUS = {
+  disponivel: 'Disponível',
+  reservado: 'Reservado',
+  entregue: 'Entregue',
+  cancelado: 'Cancelado',
+  pendente: 'Pendente',
+  aprovada: 'Aprovada',
+  recusada: 'Recusada',
+};
+
+function rotuloStatus(status) {
+  return ROTULOS_STATUS[status] || status;
+}
+
 function getToken() {
   return localStorage.getItem('doaciclo_token');
 }
@@ -33,6 +53,13 @@ async function api(caminho, opcoes = {}) {
   return dados;
 }
 
+function marcarLinkAtivo(nav) {
+  const pagina = window.location.pathname.split('/').pop() || 'index.html';
+  nav.querySelectorAll('a:not(.btn)').forEach((link) => {
+    if (link.getAttribute('href') === pagina) link.classList.add('ativo');
+  });
+}
+
 function montarCabecalho() {
   const usuario = getUsuario();
   const nav = document.getElementById('nav-usuario');
@@ -41,25 +68,25 @@ function montarCabecalho() {
   if (!usuario) {
     nav.innerHTML = `
       <a href="login.html">Entrar</a>
-      <a href="cadastro.html">Cadastrar</a>
+      <a href="cadastro.html" class="btn pequeno">Criar conta</a>
     `;
+    marcarLinkAtivo(nav);
     return;
   }
 
-  let links = `<span>Ola, ${usuario.nome} (${usuario.tipo})</span>`;
+  let links = '';
   if (usuario.tipo === 'doador') links += `<a href="doar.html">Doar item</a>`;
   if (usuario.tipo === 'admin' || usuario.tipo === 'doador') links += `<a href="admin.html">Painel</a>`;
-  if (usuario.tipo === 'beneficiario') links += `<a href="minhas-solicitacoes.html">Minhas solicitacoes</a>`;
-  links += `<button id="btn-sair">Sair</button>`;
+  if (usuario.tipo === 'beneficiario') links += `<a href="minhas-solicitacoes.html">Minhas solicitações</a>`;
+  links += `<span class="nav-usuario">${usuario.nome}<small>${ROTULOS_TIPO[usuario.tipo] || usuario.tipo}</small></span>`;
+  links += `<button class="nav-sair" id="btn-sair">Sair</button>`;
 
   nav.innerHTML = links;
-  const btnSair = document.getElementById('btn-sair');
-  if (btnSair) {
-    btnSair.addEventListener('click', () => {
-      encerrarSessao();
-      window.location.href = 'index.html';
-    });
-  }
+  marcarLinkAtivo(nav);
+  document.getElementById('btn-sair').addEventListener('click', () => {
+    encerrarSessao();
+    window.location.href = 'index.html';
+  });
 }
 
 document.addEventListener('DOMContentLoaded', montarCabecalho);

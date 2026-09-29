@@ -34,7 +34,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app/frontend:ro
+      - ./frontend:/frontend:ro
 
 volumes:
   doaciclo_pgdata:
